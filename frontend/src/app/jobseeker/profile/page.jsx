@@ -66,7 +66,9 @@ export default function Page() {
     const init = async () => {
       try {
         const uid =
-          typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+          typeof window !== "undefined"
+            ? (localStorage.getItem("userId") || localStorage.getItem("user_id"))
+            : null;
         setUserId(uid);
         if (!uid) {
           setMessage({

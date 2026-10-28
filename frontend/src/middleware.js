@@ -4,13 +4,24 @@ export function middleware(req) {
   const role = req.cookies.get("role")?.value || req.cookies.get("userRole")?.value;
   const url = req.nextUrl.clone();
 
-  // Allow these routes for everyone
+  // Root redirects
+  if (url.pathname === "/jobseeker") {
+    url.pathname = "/jobseeker/dashboard";
+    return NextResponse.redirect(url);
+  }
+  if (url.pathname === "/recruiter") {
+    url.pathname = "/recruiter/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // Allow these routes for everyone without login
   const publicRoutes = [
     "/landingpage",
     "/login", 
     "/register",
     "/unauthorized",
     "/jobseeker/study-materials",
+    "/jobseeker/jobs",
     "/"
   ];
 
@@ -24,11 +35,12 @@ export function middleware(req) {
     if (isPublicRoute) {
       return NextResponse.next();
     }
-    url.pathname = "/unauthorized";
+    // Redirect unauthenticated visitors to login
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // Role-based restrictions
+  // Role-based restrictions for logged in users
   if (url.pathname.startsWith("/recruiter") && role !== "recruiter") {
     url.pathname = "/unauthorized";
     return NextResponse.redirect(url);

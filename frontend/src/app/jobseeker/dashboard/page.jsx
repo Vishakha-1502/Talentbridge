@@ -77,14 +77,21 @@ export default function Dashboard() {
     try {
       setLoading(true)
       setError(null)
-      const token = localStorage.getItem('token')
-      const userId = localStorage.getItem('userId')
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const userId = typeof window !== 'undefined' ? (localStorage.getItem('userId') || localStorage.getItem('user_id')) : null
       
       console.log('Jobseeker dashboard fetch started:', { token: !!token, userId })
       
       if (!token || !userId) {
-        router.push('/unauthorized')
+        setLoading(false)
+        router.push('/login')
         return
+      }
+
+      // Keep role cookie active for middleware
+      if (typeof document !== 'undefined') {
+        document.cookie = "role=jobseeker; path=/; max-age=604800";
+        document.cookie = "userRole=jobseeker; path=/; max-age=604800";
       }
 
       // Fetch user profile
